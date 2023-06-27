@@ -7,9 +7,9 @@ import galaxy from '../background/galaxy.jpg'
 function Setup(){
     // Setup
     const canvasRef = useRef(null);
-    const textRef = useRef(null);
 
     useEffect(() =>{
+        if (!canvasRef.current) return;
         
         //setup scene, camera, renderer
         const scene = new THREE.Scene();
@@ -23,7 +23,6 @@ function Setup(){
         camera.position.setX(10);
         camera.position.setY(0);
 
-        //Try putting this lower
         renderer.render(scene, camera);
 
         // Background
@@ -60,7 +59,7 @@ function Setup(){
 
         Array(100).fill().forEach(addStar);
 
-         // Avatar (add blocks)
+         // Galaxy spheres
         const galaxyTexture = new THREE.TextureLoader().load(galaxy);
         function addGalaxy(){
             const galaxy = new THREE.Mesh(new THREE.SphereGeometry(6,32,32), new THREE.MeshBasicMaterial({ map: galaxyTexture }));
@@ -75,13 +74,12 @@ function Setup(){
 
         Array(5).fill().forEach(addGalaxy);
 
-
+        //Box
         const boxTexture = new THREE.TextureLoader().load(sky);
         const box = new THREE.Mesh(new THREE.BoxGeometry(3, 3, 3), new THREE.MeshBasicMaterial({ map: boxTexture }));
-        box.position.z = -5;
+        box.position.z = -2;
         box.position.x = 2;
         scene.add(box);
-
 
 
         // Animation Loop
@@ -93,24 +91,9 @@ function Setup(){
             torus.rotation.z += 0.01;
 
             //controls.update();
-
             renderer.render(scene, camera);
         }
         animate();
-
-        // function handleScroll() {
-        //     const t = document.body.getBoundingClientRect().top;
-
-        //     box.rotation.y += 0.05;
-        //     box.rotation.z += 0.05;
-
-        //     camera.position.z = t * -0.01;
-        //     camera.position.x = t * -0.0005;
-        //     camera.rotation.y = t * -0.0002;
-        //     console.log("herer");
-
-        // }
-        // window.addEventListener('scroll', handleScroll);
 
         //WHEEL METHOD OF SCROLLING
         const handleWheel = (event) => {
@@ -120,6 +103,10 @@ function Setup(){
             camera.position.z += delta * scrollSpeed;
             camera.position.x += delta * scrollSpeed * -0.1;
             camera.rotation.y += delta * scrollSpeed * -0.0002;
+
+            box.rotation.x += 0.10;
+            box.rotation.y += 0.05;
+            box.rotation.z += 0.10;
     
             renderer.render(scene, camera);
           };
@@ -138,9 +125,8 @@ function Setup(){
 
         //Cleanup
         return() => {
-            //canvasRef.current.removeEventListener('scroll', handleScroll);
+            canvasRef.current.removeEventListener('wheel', handleWheel);
             window.removeEventListener('resize', handleResize);
-            //scene.remove(spaceTexture);
             renderer.dispose();
         }
     }, []);
